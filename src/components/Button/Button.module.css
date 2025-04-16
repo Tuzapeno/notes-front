@@ -1,0 +1,54 @@
+/* Certifique-se de que estas variáveis estão definidas globalmente (ex: :root)
+   ou no escopo pai do botão */
+:root {
+  --input-focus: #2d8cf0; /* Não usado diretamente aqui, mas parte do tema */
+  --font-color: #323232; /* Cor do texto do botão */
+  --font-color-sub: #666;
+  --bg-color: beige; /* Cor de fundo do botão (parte de cima) */
+  --main-color: black; /* Cor da borda e da "sombra"/base */
+  --card-bg-color: lightblue;
+}
+
+/* --- Estilo do Botão Pushable Adaptado --- */
+
+/* O container .button age como a base/sombra */
+.button {
+  /* Removemos variáveis antigas */
+  border-radius: 5px; /* Mesmo radius do login/note */
+  background: var(--main-color); /* A cor da "sombra" */
+  border: none;
+  padding: 0; /* Sem padding no container */
+  cursor: pointer;
+  display: inline-block; /* Para se comportar bem no fluxo */
+  /* Removidos: font-size, font-weight (vão para .button_top) */
+}
+
+/* O .button_top é a parte visível e clicável */
+.button_top {
+  display: block;
+  box-sizing: border-box;
+  border: 2px solid var(--main-color); /* Borda como no login/note */
+  border-radius: 5px; /* Mesmo radius */
+  padding: 8px 15px; /* Padding similar ao botão da nota */
+  background: var(--bg-color); /* Fundo como no login/note */
+  color: var(--font-color); /* Cor do texto como no login/note */
+  font-size: 17px; /* Mantido do original, ajuste se necessário */
+  font-weight: 600; /* Peso da fonte como no login/note */
+
+  /* Simula a sombra inicial movendo o botão para cima/esquerda */
+  transform: translate(-3px, -3px);
+  transition: transform 0.1s ease; /* Transição suave */
+  /* Se quiser um efeito de sombra maior, aumente o translate:
+     transform: translate(-4px, -4px); */
+}
+
+/* Efeito Hover: move um pouco mais para dar feedback */
+.button:hover .button_top {
+  transform: translate(-4px, -4px);
+}
+
+/* Efeito Active: move para a posição (0,0), simulando
+   o desaparecimento da sombra e o clique */
+.button:active .button_top {
+  transform: translate(0, 0);
+}

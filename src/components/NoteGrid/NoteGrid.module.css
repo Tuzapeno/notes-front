@@ -1,0 +1,9 @@
+.background_container {
+  background: beige;
+  gap: 20px;
+  border-radius: 5px;
+  border: 2px solid var(--main-color);
+  box-shadow: 4px 4px var(--main-color);
+  padding: 50px;
+  margin: 60px;
+}
