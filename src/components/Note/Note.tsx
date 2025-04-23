@@ -1,18 +1,18 @@
-import { useState } from "react"
-import { useAppDispatch } from "@/app/hooks"
-import { removeNote } from "@/features/notes/noteSlice"
-import { MdInvertColors } from "react-icons/md"
-import Button from "@components/Button/Button"
+import { useEffect, useState } from "react";
+import { useAppDispatch } from "@/app/hooks";
+import { removeNote, updateNote } from "@/features/notes/noteSlice";
+import { MdInvertColors } from "react-icons/md";
+import Button from "@components/Button/Button";
 
-import noteStyle from "./Note.module.css"
+import noteStyle from "./Note.module.css";
 
 interface NoteProps {
-  id?: number
-  title: string
-  description: string
-  date: string
-  lastEditDate?: string
-  initialColor?: string
+  id?: number;
+  title?: string;
+  description?: string;
+  date: string;
+  lastEditDate?: string;
+  initialColor?: string;
 }
 
 const availableColors = [
@@ -22,7 +22,7 @@ const availableColors = [
   "lightpink",
   "lightsalmon",
   "lightseagreen",
-]
+];
 
 // TODO: Adicionar atualizacao na data da ultima edicao
 const Note = ({
@@ -35,30 +35,46 @@ const Note = ({
     " " +
     new Date().toLocaleTimeString(),
 }: NoteProps) => {
-  const dispatch = useAppDispatch()
-  const [editTitle, setEditTitle] = useState<string>(title)
-  const [editDescription, setEditDescription] = useState<string>(description)
+  const dispatch = useAppDispatch();
+  const [editTitle, setEditTitle] = useState<string>(title || "");
+  const [editDescription, setEditDescription] = useState<string>(
+    description || "",
+  );
 
-  const [cardColor, setCardColor] = useState<string>(initialColor)
-  const [isDisapearing, setIsDisapearing] = useState<boolean>(false)
+  const [cardColor, setCardColor] = useState<string>(initialColor);
+  const [isDisapearing, setIsDisapearing] = useState<boolean>(false);
 
   const handleDelete = () => {
-    setIsDisapearing(true)
-  }
+    setIsDisapearing(true);
+  };
 
   const handleAnimationEnd = () => {
     if (isDisapearing) {
-      dispatch(removeNote(id))
+      dispatch(removeNote(id));
     }
-  }
+  };
+
+  useEffect(() => {
+    dispatch(
+      updateNote({
+        id,
+        title: editTitle,
+        description: editDescription,
+        date,
+        initialColor: cardColor,
+        lastEditDate:
+          new Date().toDateString() + " " + new Date().toLocaleTimeString(),
+      }),
+    );
+  }, [editTitle, editDescription, cardColor]);
 
   const handleChangeColor = () => {
-    const currentIndex = availableColors.indexOf(cardColor)
-    const nextIndex = (currentIndex + 1) % availableColors.length
-    setCardColor(availableColors[nextIndex])
-  }
+    const currentIndex = availableColors.indexOf(cardColor);
+    const nextIndex = (currentIndex + 1) % availableColors.length;
+    setCardColor(availableColors[nextIndex]);
+  };
 
-  const cardClasses = `${noteStyle.card} ${isDisapearing ? noteStyle.is_disapearing : ""}`
+  const cardClasses = `${noteStyle.card} ${isDisapearing ? noteStyle.is_disapearing : ""}`;
 
   return (
     <div
@@ -72,7 +88,7 @@ const Note = ({
           type="text"
           className={noteStyle.text_title}
           value={editTitle}
-          onChange={e => setEditTitle(e.target.value)}
+          onChange={(e) => setEditTitle(e.target.value)}
           placeholder={"Digite o título"}
         />
       </div>
@@ -82,7 +98,7 @@ const Note = ({
         <textarea
           className={noteStyle.text_body}
           value={editDescription}
-          onChange={e => setEditDescription(e.target.value)}
+          onChange={(e) => setEditDescription(e.target.value)}
           placeholder="Digite o conteúdo"
         />
       </div>
@@ -105,8 +121,8 @@ const Note = ({
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Note
-export type { NoteProps }
+export default Note;
+export type { NoteProps };

@@ -1,55 +1,69 @@
-import { ChangeEvent, FormEvent, useState } from "react"
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 
-import Button from "@/components/Button/Button"
-import Greetings from "@/components/Greetings"
-import RequiredInputWithLabel from "@/components/RequiredInputWithLabel"
+import Button from "@/components/Button/Button";
+import Greetings from "@/components/Greetings";
+import RequiredInputWithLabel from "@/components/RequiredInputWithLabel";
 
-import loginStyle from "./login.module.css"
-import { useNavigate } from "react-router-dom"
-import { ApiDoLogin } from "../api/api"
-import { useDispatch } from "react-redux"
-import { login } from "../auth/authSlice"
-import type { LoginProps } from "./types"
-import type { LoginResponseData } from "@features/api/types"
-import type { UserCredentials } from "@features/auth/types"
-import { AxiosResponse } from "axios"
+import loginStyle from "./login.module.css";
+import { useNavigate } from "react-router-dom";
+import { ApiDoLogin } from "../api/api";
+import { useDispatch } from "react-redux";
+import { login } from "../auth/authSlice";
+import type { LoginProps } from "./types";
+import type { LoginResponseData } from "@features/api/types";
+import type { UserCredentials } from "@features/auth/types";
+import { AxiosResponse } from "axios";
 
 const LoginForm = () => {
-  const [email, setEmail] = useState<string>("")
-  const [password, setPassword] = useState<string>("")
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    handleLogin({ email, password })
-  }
+    e.preventDefault();
+    handleLogin({ email, password });
+  };
 
   const handleLogin = async ({ email, password }: LoginProps) => {
     const response: AxiosResponse<LoginResponseData, any> | undefined =
-      await ApiDoLogin({ email, password })
+      await ApiDoLogin({ email, password });
 
     if (response === undefined) {
-      alert("Login failed")
-      return
+      alert("Login failed");
+      return;
     }
 
     if (response.status === 200) {
-      const username = response.data.user.username
-      const token = response.data.token
+      const username = response.data.user.username;
+      const token = response.data.token;
 
       const credentials: UserCredentials = {
         username: username,
         accessToken: token,
-      }
+        id: response.data.user.id,
+      };
 
-      dispatch(login(credentials))
-      navigate("/notes")
+      localStorage.setItem("userCredentials", JSON.stringify(credentials));
+
+      dispatch(login(credentials));
+      navigate("/notes");
     } else {
-      alert("Login failed")
+      alert("Login failed");
     }
-  }
+  };
+
+  // Check if the user is already logged in and redirect to the notes page
+  useEffect(() => {
+    const userCredentials = localStorage.getItem("userCredentials");
+    if (userCredentials) {
+      dispatch(login(JSON.parse(userCredentials)));
+      navigate("/notes");
+    } else {
+      console.log("Credentials not found, redirecting to login page");
+    }
+  }, []);
 
   return (
     <>
@@ -81,15 +95,14 @@ const LoginForm = () => {
             <Button type="submit" label="Entrar" onAction={() => {}} />
             <div className={loginStyle.login_options_links}>
               <a href="/register"> Não tenho uma conta </a>
-              <a href="/lostpassword"> Esqueci minha senha </a>
             </div>
           </div>
         </div>
       </form>
     </>
-  )
-}
+  );
+};
 
-export default LoginForm
+export default LoginForm;
 
-export type { LoginProps }
+export type { LoginProps };

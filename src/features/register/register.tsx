@@ -1,28 +1,29 @@
-import RequiredInputWithLabel from "@components/RequiredInputWithLabel"
-import { ChangeEvent, FormEvent, useState } from "react"
+import RequiredInputWithLabel from "@components/RequiredInputWithLabel";
+import { ChangeEvent, FormEvent, useState } from "react";
 
-import type { LoginResponseData, RegisterData } from "@features/api/types"
-import { ApiDoRegister } from "@features/api/api"
+import type { LoginResponseData, RegisterData } from "@features/api/types";
+import { ApiDoRegister } from "@features/api/api";
 
-import registerStyle from "@features/login/login.module.css"
-import Button from "@/components/Button/Button"
-import { AxiosResponse } from "axios"
-import { useDispatch } from "react-redux"
+import registerStyle from "@features/login/login.module.css";
+import Button from "@/components/Button/Button";
+import { AxiosResponse } from "axios";
+import { useDispatch } from "react-redux";
 
-import { login } from "@features/auth/authSlice"
-import { useNavigate } from "react-router-dom"
+import { login } from "@features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
+import { UserCredentials } from "../auth/types";
 
 function Register() {
-  const [email, setEmail] = useState<string>("")
-  const [username, setUsername] = useState<string>("")
-  const [cpf, setCpf] = useState<string>("")
-  const [password, setPassword] = useState<string>("")
-  const [confirmPassword, setConfirmPassword] = useState<string>("")
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const [email, setEmail] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
+  const [cpf, setCpf] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     const registerData: RegisterData = {
       email,
@@ -30,37 +31,39 @@ function Register() {
       cpf,
       password,
       password_confirmation: confirmPassword,
-    }
+    };
 
-    registerForm(registerData)
-  }
+    registerForm(registerData);
+  };
 
   const registerForm = async (data: RegisterData) => {
     const response: AxiosResponse<LoginResponseData, any> | undefined =
-      await ApiDoRegister(data)
+      await ApiDoRegister(data);
 
     if (response === undefined) {
-      console.log("Registration failed")
-      console.log("No response.")
-      return
+      console.log("Registration failed");
+      console.log("No response.");
+      return;
     }
 
-    if (response.status === 201) {
-      console.log("Registration successful")
-      console.log(response.data)
+    if (response.status === 200) {
+      console.log("Registration successful");
+      console.log(response.data);
 
-      const loginData = {
+      const loginData: UserCredentials = {
         username: response.data.user.username,
         accessToken: response.data.token,
-      }
+        id: response.data.user.id,
+      };
 
-      dispatch(login(loginData))
-      navigate("/notes")
+      localStorage.setItem("userCredentials", JSON.stringify(loginData));
+      dispatch(login(loginData));
+      navigate("/notes");
     } else {
-      console.log("Registration failed")
-      console.log(response.status)
+      console.log("Registration failed");
+      console.log(response.status);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className={registerStyle.form}>
@@ -113,7 +116,7 @@ function Register() {
         <Button type="submit" label="Cadastrar" onAction={() => {}} />
       </div>
     </form>
-  )
+  );
 }
 
-export default Register
+export default Register;
